@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>「服務營辦商牌照持牌人」查詢系統</title>
+    <!-- Awesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <style>
+        .element-hidden {
+            display: none !important;
+        }
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            padding: 16px;
+            color: #1f2937;
+        }
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 100vh;
+        }
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header h1 {
+            color: #111827;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+        /* Form Section */
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-group label i {
+            color: #3b82f6;
+        }
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .search-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .search-input {
+            flex: 1;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+        }
+        .data-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        /* Data Section Styles */
+        .data-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .data-header h2 {
+            color: #111827;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .data-header .subtitle {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .data-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3b82f6;
+            display: block;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .accordion-container {
+            margin-top: 20px;
+        }
+        .licensee-group {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .licensee-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .licensee-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .licensee-header.active {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+        }
+        .licensee-header i {
+            transition: transform 0.3s ease;
+        }
+        .licensee-header.collapsed i {
+            transform: rotate(-90deg);
+        }
+        .licensee-content {
+            padding: 20px;
+            background: white;
+        }
+        .service-list {
+            display: grid;
+            gap: 12px;
+        }
+        .service-item {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.2s ease;
+        }
+        .service-item:hover {
+            background: #f1f5f9;
+            border-color: #3b82f6;
+        }
+        .service-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .service-row {
+            display: flex;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .service-label {
+            font-weight: 600;
+            color: #374151;
+            width: 200px;
+            flex-shrink: 0;
+        }
+        .service-value {
+            flex: 1;
+            color: #6b7280;
+            word-break: break-word;
+        }
+        .service-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .badge-yes {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-no {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-license {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .badge-name {
+            background: #f3e8ff;
+            color: #5b21b6;
+        }
+        .licensee-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+            padding: 20px;
+            margin-top: auto;
+        }
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 3000;
+            animation: slideIn 0.3s ease-out;
+        }
+        .notification.success {
+            background-color: #10b981;
+            color: white;
+        }
+        .notification.error {
+            background-color: #ef4444;
+            color: white;
+        }
+        .notification.info {
+            background-color: #3b82f6;
+            color: white;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+                background: #1e3a8a;
+            }
+            .container {
+                gap: 16px;
+            }
+            .header {
+                padding: 16px;
+                border-radius: 12px;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .form-section {
+                padding: 20px;
+            }
+            .main-content {
+                flex-direction: column;
+            }
+            .data-section {
+                max-height: 400px;
+                padding: 15px;
+            }
+            .data-header h2 {
+                font-size: 1.3rem;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            .service-info {
+                grid-template-columns: 1fr;
+            }
+            .service-row {
+                flex-direction: column;
+                margin-bottom: 12px;
+            }
+            .service-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .licensee-header {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+        /* Desktop Enhancements */
+        @media (min-width: 1200px) {
+            .data-section {
+                max-height: 65vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>「服務營辦商牌照持牌人」<br/>查詢系統</h1>
+            <p class="subtitle">資訊來源：通訊事務管理局辦公室</p>
+        </header>
+        <section class="form-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="searchLicensee">
+                        <i class="fas fa-search"></i>
+                        搜尋牌照持有人
+                    </label>
+                    <div class="search-group">
+                        <input type="text" id="searchLicensee" class="form-control search-input" placeholder="輸入公司名稱或牌照號碼...">
+                        <button type="button" class="btn btn-primary" onclick="searchLicensees()">
+                            <i class="fas fa-search"></i>
+                            搜尋
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="loadAllData()">
+                    <i class="fas fa-sync-alt"></i>
+                    載入所有資料
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                    <i class="fas fa-redo"></i>
+                    重置
+                </button>
+            </div>
+        </section>
+        <main class="main-content">
+            <section class="data-section">
+                <div class="data-header">
+                    <h2>服務營辦商牌照持有人列表</h2>
+                    <p class="subtitle">點擊公司名稱查看更多詳細資訊</p>
+                </div>
+                <div class="data-stats">
+                    <div class="stat-item">
+                        <span id="total-licensees" class="stat-value">0</span>
+                        <span class="stat-label">牌照持有人總數</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="total-mvno" class="stat-value">0</span>
+                        <span class="stat-label">MVNO服務</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="total-ets" class="stat-value">0</span>
+                        <span class="stat-label">ETS服務</span>
+                    </div>
+                </div>
+                <div class="accordion-container" id="accordion-container">
+                    <div class="no-data">
+                        <i class="fas fa-building"></i>
+                        <p>請點擊「載入所有資料」按鈕開始查詢</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="footer">
+            <p>「服務營辦商牌照持牌人」查詢系統<br/>資料來源: 通訊事務管理局辦公室<span id="last-updated" hidden></span></p>
+        </footer>
+    </div>
+    <script>
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com';
+        const DATA_URL = `https://www.ofca.gov.hk/filemanager/ofca/common/datagovhk/sbo_lic_tc.csv`;
+        
+        // IndexedDB 配置
+        const DB_NAME = 'licensees-db';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'licensees';
+        
+        // 全局變量
+        let licenseesData = [];
+        let filteredData = [];
+        let db;
+        
+        // 初始化應用
+        document.addEventListener('DOMContentLoaded', function () {
+            updateLastUpdatedTime();
+            initIndexedDB();
+            
+            // 為搜尋輸入框添加 Enter 鍵支援
+            document.getElementById('searchLicensee').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchLicensees();
+                }
+            });
+        });
+        
+        // 初始化 IndexedDB
+        function initIndexedDB() {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            
+            request.onerror = function(event) {
+                console.error('IndexedDB 初始化失敗:', event.target.error);
+                showNotification('瀏覽器資料庫初始化失敗，將使用在線資料', 'error');
+            };
+            
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                console.log('IndexedDB 初始化成功');
+                checkAndLoadData();
+            };
+            
+            request.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    const store = db.createObjectStore(STORE_NAME, { keyPath: 'LIC_NO' });
+                    store.createIndex('LICENSEE_NAME', 'LICENSEE_NAME', { unique: false });
+                    store.createIndex('LOCAL_TEL_C1', 'LOCAL_TEL_C1', { unique: false });
+                    store.createIndex('LOCAL_TEL_C2', 'LOCAL_TEL_C2', { unique: false });
+                }
+            };
+        }
+        
+        // 檢查並載入資料
+        function checkAndLoadData() {
+            if (!db) {
+                loadDataFromAPI();
+                return;
+            }
+            
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const countRequest = store.count();
+            
+            countRequest.onsuccess = function(event) {
+                const count = event.target.result;
+                if (count > 0) {
+                    // 從 IndexedDB 載入資料
+                    const getAllRequest = store.getAll();
+                    getAllRequest.onsuccess = function(event) {
+                        licenseesData = event.target.result;
+                        filteredData = [...licenseesData];
+                        updateStatistics();
+                        updateLicenseeList();
+                        showNotification(`已從本地緩存載入 ${count} 筆資料`, 'success');
+                    };
+                    
+                    getAllRequest.onerror = function(event) {
+                        console.error('從 IndexedDB 讀取資料失敗:', event.target.error);
+                        loadDataFromAPI();
+                    };
+                } else {
+                    // 從 API 載入資料
+                    loadDataFromAPI();
+                }
+            };
+            
+            countRequest.onerror = function(event) {
+                console.error('檢查 IndexedDB 資料數量失敗:', event.target.error);
+                loadDataFromAPI();
+            };
+        }
+        
+        // 從 API 載入資料
+        async function loadDataFromAPI() {
+            const container = document.getElementById('accordion-container');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在載入資料...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(`${PROXY_URL}/${DATA_URL}`);
+                
+                if (!response.ok) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>請先訪問 <a href="${PROXY_URL}" target="_blank">${PROXY_URL}</a></p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">點擊「Request temporary access to the demo server」按鈕啟用代理伺服器</p>
+                        </div>
+                    `;
+                    showNotification('請啟用 CORS Anywhere 代理伺服器', 'error');
+                    return;
+                }
+                
+                const csvText = await response.text();
+                licenseesData = parseCSV(csvText);
+                
+                // 儲存到 IndexedDB
+                saveToIndexedDB(licenseesData);
+                
+                filteredData = [...licenseesData];
+                updateStatistics();
+                updateLicenseeList();
+                updateLastUpdatedTime();
+                showNotification(`成功載入 ${licenseesData.length} 筆牌照持有人資料`, 'success');
+                
+            } catch (error) {
+                console.error('載入資料時出錯:', error);
+                container.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>載入資料時出錯</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">${error.message}</p>
+                    </div>
+                `;
+                showNotification('載入資料時出錯，請稍後再試', 'error');
+            }
+        }
+        
+        // 解析 CSV 資料
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',').map(header => header.trim());
+            
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                // 處理可能包含逗號的欄位
+                const values = [];
+                let currentValue = '';
+                let inQuotes = false;
+                
+                for (let char of line) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(currentValue.trim());
+                        currentValue = '';
+                    } else {
+                        currentValue += char;
+                    }
+                }
+                values.push(currentValue.trim());
+                
+                const entry = {};
+                headers.forEach((header, index) => {
+                    entry[header] = values[index] || '';
+                });
+                
+                // 確保有 LIC_NO 和 LICENSEE_NAME
+                if (entry.LIC_NO && entry.LICENSEE_NAME) {
+                    data.push(entry);
+                }
+            }
+            
+            return data;
+        }
+        
+        // 儲存到 IndexedDB
+        function saveToIndexedDB(data) {
+            if (!db) return;
+            
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            
+            // 清空現有資料
+            store.clear();
+            
+            // 儲存新資料
+            data.forEach(item => {
+                store.put(item);
+            });
+            
+            transaction.oncomplete = function() {
+                console.log('資料已儲存到 IndexedDB');
+            };
+            
+            transaction.onerror = function(event) {
+                console.error('儲存到 IndexedDB 失敗:', event.target.error);
+            };
+        }
+        
+        // 更新最後更新時間
+        function updateLastUpdatedTime() {
+            const now = new Date();
+            const formattedTime = now.toLocaleString('zh-HK', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('last-updated').textContent = formattedTime;
+        }
+        
+        // 重置表單
+        function resetForm() {
+            document.getElementById('searchLicensee').value = '';
+            filteredData = [...licenseesData];
+            updateStatistics();
+            updateLicenseeList();
+            showNotification('已重置搜尋條件', 'info');
+        }
+        
+        // 載入所有資料
+        function loadAllData() {
+            if (licenseesData.length === 0) {
+                checkAndLoadData();
+            } else {
+                filteredData = [...licenseesData];
+                updateStatistics();
+                updateLicenseeList();
+                showNotification(`已顯示所有 ${licenseesData.length} 筆資料`, 'info');
+            }
+        }
+        
+        // 搜尋牌照持有人
+        function searchLicensees() {
+            const searchTerm = document.getElementById('searchLicensee').value.trim().toLowerCase();
+            
+            if (!searchTerm) {
+                filteredData = [...licenseesData];
+            } else {
+                filteredData = licenseesData.filter(licensee => {
+                    return licensee.LICENSEE_NAME.toLowerCase().includes(searchTerm) ||
+                           licensee.LIC_NO.toLowerCase().includes(searchTerm);
+                });
+            }
+            
+            updateStatistics();
+            updateLicenseeList();
+            
+            if (filteredData.length === 0) {
+                showNotification('未找到符合搜尋條件的牌照持有人', 'info');
+            } else {
+                showNotification(`找到 ${filteredData.length} 筆符合搜尋條件的資料`, 'success');
+            }
+        }
+        
+        // 更新統計數據
+        function updateStatistics() {
+            const totalLicensees = filteredData.length;
+            const totalMVNO = filteredData.filter(item => item.MVNO === 'Y').length;
+            const totalETS = filteredData.filter(item => item.ETS === 'Y').length;
+            
+            document.getElementById('total-licensees').textContent = totalLicensees;
+            document.getElementById('total-mvno').textContent = totalMVNO;
+            document.getElementById('total-ets').textContent = totalETS;
+        }
+        
+        // 更新牌照持有人列表
+        function updateLicenseeList() {
+            const container = document.getElementById('accordion-container');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-building"></i>
+                        <p>沒有找到牌照持有人資料</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">請嘗試不同的搜尋條件或載入所有資料</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let accordionHTML = '';
+            
+            filteredData.forEach((licensee, index) => {
+                const licenseNo = licensee.LIC_NO || 'N/A';
+                const licenseeName = licensee.LICENSEE_NAME || '未知公司';
+                
+                accordionHTML += `
+                    <div class="licensee-group" data-lic-no="${licenseNo}">
+                        <div class="licensee-header" onclick="toggleLicenseeGroup(${index})">
+                            <div>
+                                <i class="fas fa-building" style="margin-right: 8px;"></i>
+                                <span>${licenseeName}（牌照號碼：${licenseNo}）</span>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="licensee-group-${index}" class="licensee-content" style="display: none;">
+                            <div class="licensee-meta">
+                                <span class="service-badge badge-license">
+                                    <i class="fas fa-id-card" style="margin-right: 4px;"></i>
+                                    牌照號碼: ${licenseNo}
+                                </span>
+                                <span class="service-badge badge-name">
+                                    <i class="fas fa-building" style="margin-right: 4px;"></i>
+                                    公司名稱: ${licenseeName}
+                                </span>
+                            </div>
+                            <div class="service-list">
+                                <div class="service-item">
+                                    <div class="service-info">
+                                        <div>
+                                            <div class="service-row">
+                                                <div class="service-label">本地固網電訊服務 (第一類服務)：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.LOCAL_TEL_C1 === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.LOCAL_TEL_C1 === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="service-row">
+                                                <div class="service-label">本地固網電訊服務 (第二類服務)：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.LOCAL_TEL_C2 === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.LOCAL_TEL_C2 === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="service-row">
+                                                <div class="service-label">移動虛擬網絡營辦商：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.MVNO === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.MVNO === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="service-row">
+                                                <div class="service-label">對外電訊服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.ETS === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.ETS === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="service-row">
+                                                <div class="service-label">互聯網接入服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.IAS === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.IAS === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="service-row">
+                                                <div class="service-label">互聯網互通服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.IVANS === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.IVANS === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="service-info">
+                                        <div>
+                                            <div class="service-row">
+                                                <div class="service-label">公共收費電話服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.PAYPHONE === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.PAYPHONE === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="service-row">
+                                                <div class="service-label">無線電中繼器服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.RADIO_RELAY === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.RADIO_RELAY === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="service-row">
+                                                <div class="service-label">警報系統服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.ALARM === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.ALARM === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="service-row">
+                                                <div class="service-label">電話會議服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.TELECONF === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.TELECONF === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="service-row">
+                                                <div class="service-label">行動社區天線系統服務：</div>
+                                                <div class="service-value">
+                                                    <span class="service-badge ${licensee.MCA === 'Y' ? 'badge-yes' : 'badge-no'}">
+                                                        ${licensee.MCA === 'Y' ? '是' : '否'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = accordionHTML;
+        }
+        
+        // 切換摺疊群組
+        function toggleLicenseeGroup(index) {
+            const content = document.getElementById(`licensee-group-${index}`);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.fa-chevron-down, .fa-chevron-up');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                header.classList.add('active');
+                icon.className = 'fas fa-chevron-up';
+            } else {
+                content.style.display = 'none';
+                header.classList.remove('active');
+                icon.className = 'fas fa-chevron-down';
+            }
+        }
+        
+        // 顯示通知
+        function showNotification(message, type = 'info') {
+            // 移除現有通知
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // 創建通知元素
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // 添加到文檔
+            document.body.appendChild(notification);
+            
+            // 3秒後移除
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // 初始化教程
+        if (!localStorage.getItem('licenseeTutorialShown')) {
+            setTimeout(() => {
+                alert("歡迎使用「服務營辦商牌照持牌人」查詢系統！\n\n• 點擊「載入所有資料」按鈕下載最新資料\n• 可在搜尋框輸入公司名稱或牌照號碼進行搜尋\n• 資料會自動緩存在瀏覽器中，下次使用無需重新下載\n• 點擊公司名稱可展開查看詳細服務資訊");
+                localStorage.setItem('licenseeTutorialShown', 'true');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
